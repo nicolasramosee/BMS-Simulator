@@ -10,7 +10,7 @@ This project simulates a high speed robotics telemetry link. It uses a virtual s
 1. **Robot Firmware (Simulated):** Bash script generating JSON telemetry packets (Voltage/Temp).
 2. **Virtual Wire:** `socat` based PTY bridge simulating physical serial ports.
 3. **Ground Station:** Node.js server using `serialport` and `socket.io`.
-4. **Dashboard:** Live web UI with real-time Chart.js visualization (can view a screenshot of the dashboard in the `docs` folder.
+4. **Dashboard:** Live web UI with real-time Chart.js visualization (can view a screenshot of the dashboard in the `docs` folder).
 
 ## Data Flow
 robot_sim.sh **→** Generates simulated battery telemetry (JSON packets containing voltage and temperature) **→** Virtual UART Link (socat PTY bridge) **→** Acts as a virtual serial cable between the robot and ground station **→** server.js **→** Reads serial data **→** parses telemetry **→** broadcasts via WebSockets **→** index.html dashboard **→** Displays real time voltage and temperature with a live updating chart
