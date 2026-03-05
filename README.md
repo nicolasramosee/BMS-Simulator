@@ -1,0 +1,21 @@
+# BMS (Battery Monitoring System): Hardware-in-the-Loop Simulator
+A real-time Battery Management System (BMS) telemetry dashboard developed in **Node.js** to simulate embedded robotics sensor data via **UART**.
+
+## Project Overview
+This project simulates a high speed robotics telemetry link. It uses a virtual serial bridge to stream battery health data from a simulated firmware script (the "Robot") to a Node.js Ground Station and live web dashboard.
+
+### Job Alignment (Nova Dynamics Requirements):
+- **Node.js Proficiency:** Event-driven backend for high-frequency data ingestion.
+- **Communication Protocols:** Hands-on implementation of **UART/Serial** telemetry.
+
+## System Architecture
+1. **Robot Firmware (Simulated):** Bash/C++ script generating JSON telemetry packets (Voltage/Temp).
+2. **Virtual Wire:** `socat` based PTY bridge simulating physical serial ports.
+3. **Ground Station:** Node.js server using `serialport` and `socket.io`.
+4. **Dashboard:** Live web UI with real-time Chart.js visualization.
+
+## Getting Started
+1. **Create the Link:** `socat -d -d pty,raw,echo=0 pty,raw,echo=0`
+2. **Start Dashboard:** `cd dashboard-app && node server.js`
+3. **Start Robot:** `./robot-firmware/robot_sim.sh`
+4. **View:** Open `http://localhost:3000`

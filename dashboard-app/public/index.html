@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BMS Simulator</title>
+
+<!-- WebSocket client used for real time telemetry updates -->
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- Chart.js used for live visualization of telemetry data -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body
+{
+    font-family: sans-serif;
+    background: #121212;
+    color: white;
+    text-align: center;
+}
+
+.container
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.stats
+{
+    display: flex;
+    gap: 40px;
+    margin-bottom: 20px;
+}
+
+.stat-card
+{
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #333;
+    min-width: 150px;
+}
+
+.value
+{
+    font-size: 2em;
+    font-weight: bold;
+    color: #00ff88;
+}
+
+canvas
+{
+    max-width: 800px;
+    background: #1e1e1e;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>BMS Live Telemetry</h1>
+
+<div class="stats">
+
+<div class="stat-card">
+<div>Battery Voltage</div>
+<div id="v-val" class="value">0.00V</div>
+</div>
+
+<div class="stat-card">
+<div>System Temp</div>
+<div id="t-val" class="value">0°C</div>
+</div>
+
+</div>
+
+<!-- chart displaying voltage history -->
+<canvas id="telemetryChart"></canvas>
+
+</div>
+
+<script>
+
+// establish WebSocket connection to telemetry server
+const socket = io();
+
+// canvas context used by Chart.js
+const ctx = document.getElementById('telemetryChart').getContext('2d');
+
+// initialize voltage history chart
+const chart = new Chart(ctx,
+{
+    type: 'line',
+
+    data:
+    {
+        labels: [],
+        datasets:
+        [
+            {
+                label: 'Voltage (V)',
+                data: [],
+                borderColor: '#00ff88',
+                tension: 0.1
+            }
+        ]
+    },
+
+    options:
+    {
+        scales:
+        {
+            y:
+            {
+                min: 11,
+                max: 13
+            }
+        }
+    }
+});
+
+// listen for telemetry updates from the server
+socket.on('telemetry', (data) =>
+{
+    // update current value displays
+    document.getElementById('v-val').innerText = data.v + "V";
+    document.getElementById('t-val').innerText = data.t + "°C";
+
+    // add new data point to chart
+    const now = new Date().toLocaleTimeString();
+
+    chart.data.labels.push(now);
+    chart.data.datasets[0].data.push(data.v);
+
+    // maintain fixed window of recent samples
+    if (chart.data.labels.length > 20)
+    {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+
+    // redraw chart with updated telemetry
+    chart.update();
+});
+
+</script>
+
+</body>
+</html>
